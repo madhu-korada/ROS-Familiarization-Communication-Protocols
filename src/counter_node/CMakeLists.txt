@@ -8,9 +8,20 @@ find_package(catkin REQUIRED COMPONENTS
   chatbot_node
 )
 
+add_service_files(
+  FILES
+  counter.srv
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
 catkin_package(
   CATKIN_DEPENDS
 )
+
 
 include_directories(
 # include

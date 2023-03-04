@@ -1,6 +1,8 @@
-/.catkin_workspace
-/.vscode
-/build
-/devel
-/install
-/log
+.catkin_workspace
+.catkin_tools/
+.vscode/
+build/
+devel/
+install/
+logs/
+src/message_ui/src/message_ui/__pycache__

@@ -40,9 +40,9 @@ from python_qt_binding.QtWidgets import QShortcut, QWidget
 from rqt_gui_py.plugin import Plugin
 from message_ui.msg import sent_msg
 from chatbot_node.msg import reply_msg
-#from arithmetic_node.msg import arithmetic_reply 
+from arithmetic_node.msg import arithmetic_reply 
 from std_msgs.msg import Int16
-#from counter_node.srv import *
+from counter_node.srv import *
 
 
 class MessageGUI(Plugin):
@@ -50,13 +50,13 @@ class MessageGUI(Plugin):
     def reply_msg_callback(self, msg_in):
         self._widget.reply.setText(msg_in.message)
 
-    # def arithmetic_reply_msg_callback(self, msg_in):
-    #     display_text = 'Operation Type: '+msg_in.oper_type+'\n'+ \
-    #                    'Answer: '+str(msg_in.answer)+'\n'+ \
-    #                    'Time Received: '+str(msg_in.time_received)+'\n'+ \
-    #                    'Time Answered: '+str(msg_in.time_answered)+'\n'+ \
-    #                    'Process Time: '+str(msg_in.process_time)
-    #     self._widget.reply.setText(display_text)
+    def arithmetic_reply_msg_callback(self, msg_in):
+        display_text = 'Operation Type: '+msg_in.oper_type+'\n'+ \
+                       'Answer: '+str(msg_in.answer)+'\n'+ \
+                       'Time Received: '+str(msg_in.time_received)+'\n'+ \
+                       'Time Answered: '+str(msg_in.time_answered)+'\n'+ \
+                       'Process Time: '+str(msg_in.process_time)
+        self._widget.reply.setText(display_text)
 
     def message_count_display(self, counter_val):
         display_text = ''
@@ -80,7 +80,7 @@ class MessageGUI(Plugin):
         self.message_pub = rospy.Publisher("sent_msg", sent_msg, queue_size=1000)
 
         rospy.Subscriber("reply_msg", reply_msg, self.reply_msg_callback)
-        # rospy.Subscriber("arithmetic_reply", arithmetic_reply, self.arithmetic_reply_msg_callback)
+        rospy.Subscriber("arithmetic_reply", arithmetic_reply, self.arithmetic_reply_msg_callback)
 
         self.msg_to_send = sent_msg()
         self.counter_req_id = -1
@@ -99,7 +99,7 @@ class MessageGUI(Plugin):
         self._widget.counter_val_to_get.setInputMask('9')   
 
         self._widget.send_message.pressed.connect(self._on_send_message_pressed)
-        #self._widget.send_request.pressed.connect(self._on_send_request_pressed)
+        self._widget.send_request.pressed.connect(self._on_send_request_pressed)
         
     def _on_msg_to_send_changed(self, msg):
         msg = str(msg)
@@ -115,15 +115,15 @@ class MessageGUI(Plugin):
         except ValueError:
             print('String input is not an integer')
 
-    # def _on_send_request_pressed(self):
-    #     rospy.wait_for_service('message_counter')
-    #     try:
-    #         counter_serv = rospy.ServiceProxy('message_counter',counter)
-    #         response = counter_serv(self.counter_req_id)
-    #         self.message_count_display(response)
-    #         return response
-    #     except rospy.ServiceException, ex:
-    #         print "Service call to get message counter failed. %s"%e
+    def _on_send_request_pressed(self):
+        rospy.wait_for_service('message_counter')
+        try:
+            counter_serv = rospy.ServiceProxy('message_counter',counter)
+            response = counter_serv(self.counter_req_id)
+            self.message_count_display(response)
+            return response
+        except rospy.ServiceException:#, ex:
+            print ("Service call to get message counter failed. %s")
 
 
     def shutdown_plugin(self):
